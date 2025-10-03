@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <title>Registrazione Esiti Esami</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; margin: 20px; line-height:1.5; }
+    form { max-width: 700px; padding: 16px; border: 1px solid #ddd; border-radius: 8px; }
+    label { display:block; margin-top:10px; }
+    input[type="text"], input[type="number"], select { width:100%; padding:8px; box-sizing:border-box; }
+    .row { display:flex; gap:8px; }
+    .row > div { flex:1; }
+    .hint { font-size:0.9em; color:#555; }
+    .btn { margin-top:12px; padding:10px 14px; cursor:pointer; }
+    .error { color: #b00020; margin-top:8px; }
+    .small { font-size:0.9em; color:#444; }
+  </style>
+</head>
+<body>
+  <h1>Registrazione esito esame</h1>
+  <form id="esameForm" method="post" action="server.php" novalidate>
+    <label>
+      Matricola
+      <input type="text" name="matricola" id="matricola" required pattern="[A-Za-z0-9\-]+" placeholder="Es. 123456 or AB-2020">
+    </label>
+
+    <div class="row">
+      <div>
+        <label>
+          Cognome
+          <input type="text" name="cognome" id="cognome" required>
+        </label>
+      </div>
+      <div>
+        <label>
+          Nome
+          <input type="text" name="nome" id="nome" required>
+        </label>
+      </div>
+    </div>
+
+    <label>
+      Esame
+      <input type="text" name="esame" id="esame" required placeholder="Nome dell'esame">
+    </label>
+
+    <div class="row">
+      <div>
+        <label>
+          Votazione (1-30)
+          <input type="number" name="votazione" id="votazione" required min="1" max="30" step="1">
+        </label>
+      </div>
+      <div>
+        <label style="display:flex; align-items:center; gap:8px; margin-top:22px;">
+          <input type="checkbox" name="lode" id="lode" value="1">
+          Lode (eventuale)
+        </label>
+      </div>
+    </div>
+
+    <label>
+      Corso di Laurea
+      <select name="corso" id="corso" required>
+        <option value="">-- Seleziona corso --</option>
+        <option>Informatica Magistrale</option>
+        <option>Ingegneria Informatica</option>
+        <option>Chimica</option>
+        <option>Economia</option>
+        <option>Fisica</option>
+        <option>Matematica</option>
+      </select>
+    </label>
+
+    <div class="hint">Nota: i voti &gt; 28 saranno evidenziati in verde; i voti &lt; 28 in arancio; 28 resta neutro.</div>
+
+    <button type="submit" class="btn">Invia esito</button>
+    <div id="msg" class="error" aria-live="polite"></div>
+  </form>
+
+  <script>
+    (function(){
+      const form = document.getElementById('esameForm');
+      const msg = document.getElementById('msg');
+
+      form.addEventListener('submit', function(e){
+        msg.textContent = '';
+        // browser built-in validation (but we also check programmatically)
+        if (!form.reportValidity()) {
+          // let browser show built-in errors
+          return;
+        }
+
+        const votazione = Number(document.getElementById('votazione').value);
+        if (!Number.isInteger(votazione) || votazione < 1 || votazione > 30) {
+          e.preventDefault();
+          msg.textContent = 'La votazione deve essere un intero compreso tra 1 e 30.';
+          return;
+        }
+
+        // matricola basic sanity
+        const matricola = document.getElementById('matricola').value.trim();
+        if (matricola.length < 3) {
+          e.preventDefault();
+          msg.textContent = 'Inserire una matricola valida (almeno 3 caratteri).';
+          return;
+        }
+
+        // everything ok -> form submitted normally to server.php via action
+      });
+    })();
+  </script>
+</body>
+</html>
